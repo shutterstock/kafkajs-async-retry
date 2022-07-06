@@ -1,0 +1,61 @@
+version: "3.5"
+networks:
+  kafkajs-async-retry-app:
+    name: "kafkajs-async-retry-app"
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.5.0.0/16
+          ip_range: 10.5.0.0/24
+          gateway: 10.5.0.1
+          aux_addresses:
+            kafka: 10.5.0.2
+            zookeeper: 10.5.0.3
+            kafdrop: 10.5.0.4
+services:
+  # See:
+  # https://hub.docker.com/r/bitnami/zookeeper
+  zookeeper:
+    image: "bitnami/zookeeper:latest"
+    container_name: "kafkajs-async-retry-zookeeper"
+    networks:
+      - "kafkajs-async-retry-app"
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  # See:
+  # https://hub.docker.com/r/bitnami/kafka
+  kafka:
+    image: bitnami/kafka:2.5.0
+    container_name: "kafkajs-async-retry-kafka"
+    networks:
+      - "kafkajs-async-retry-app"
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://10.5.0.1:9092
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    depends_on:
+      - zookeeper
+#  kafdrop:
+#    image: "obsidiandynamics/kafdrop:latest"
+#    container_name: "kafkajs-async-retry-kafdrop"
+#    networks:
+#      - "kafkajs-async-retry-app"
+#    ports:
+#      - "9000:9000"
+#    environment:
+#      - "KAFKA_BROKERCONNECT=10.5.0.1:9092"
+#      - "JVM_OPTS=-Xms32M -Xmx256M"
+#      - "SERVER_SERVLET_CONTEXTPATH=/"
+#    depends_on:
+#      - kafka
+#
