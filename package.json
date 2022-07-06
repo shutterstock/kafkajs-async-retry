@@ -1,0 +1,53 @@
+{
+  "name": "kafkajs-async-retry",
+  "version": "0.0.1",
+  "description": "A helper intended for use with KafkaJS that assists with retrying failed messages an an async manner",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts",
+    "README.md"
+  ],
+  "author": {
+    "name": "Brian Phillips",
+    "email": "bphillips@shutterstock.com"
+  },
+  "devDependencies": {
+    "@jest/globals": "^28.1.0",
+    "@types/ip": "^1.1.0",
+    "@types/node": "^17.0.24",
+    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/parser": "^5.20.0",
+    "eslint": "^8.13.0",
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^8.0.1",
+    "ip": "^1.1.5",
+    "jest": "^28.1.0",
+    "kafkajs": "^2.1.0",
+    "lint-staged": "^12.3.8",
+    "prettier": "^2.6.2",
+    "ts-jest": "^28.0.2",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3"
+  },
+  "peerDependencies": {
+    "kafkajs": "^2.1.0"
+  },
+  "scripts": {
+    "build": "tsc --project ./tsconfig-dist.json",
+    "clean": "tsc --build ./tsconfig-dist.json --clean && rm -rf dist coverage *.tsbuildinfo",
+    "test": "jest",
+    "test:integration": "INTEGRATION_KAFKA_BROKER=localhost:9092 jest --coverage=false src/integration.test.ts",
+    "lint": "eslint --ext .mjs,.cjs,.js,.ts .",
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json|md)\"",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{?js,?ts}": [
+      "eslint --cache --fix",
+      "npm run format"
+    ],
+    "*.{md,json}": "npm run format"
+  }
+}
