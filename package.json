@@ -14,6 +14,8 @@
     "email": "bphillips@shutterstock.com"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-conventional": "^17.0.3",
     "@jest/globals": "^28.1.2",
     "@types/ip": "^1.1.0",
     "@types/node": "^18.0.3",
