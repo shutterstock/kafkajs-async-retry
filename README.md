@@ -205,6 +205,7 @@ Messages from the "retry" topics are then processed after a configurable delay.
 If a message continues to fail beyond a configurable maximum number of attempts, the message is published to a "dead letter" topic for manual inspection.
 Here's a sequence diagram demonstrating the process:
 
+<!-- prettier-ignore -->
 ```mermaid
 sequenceDiagram
   autonumber
@@ -259,6 +260,7 @@ To use this retry strategy, use the `RetryTopicNaming.ATTEMPT_BASED` `retryTopic
 Here's a diagram of the message flow using this retry strategy.
 This example uses a maximum of three retries with configured wait times of 5 seconds on the first two retries and a 60-second delay on the final attempt:
 
+<!-- prettier-ignore -->
 ```mermaid
 sequenceDiagram
   autonumber
@@ -305,6 +307,7 @@ To use this retry strategy, use the `RetryTopicNaming.DELAY_BASED` `retryTopicNa
 
 Here's a sequence diagram of the various topics needing when using a `DELAY_BASED` naming strategy with the `retryDelays` parameter set to `[5, 5, 60]`:
 
+<!-- prettier-ignore -->
 ```mermaid
 sequenceDiagram
   autonumber
