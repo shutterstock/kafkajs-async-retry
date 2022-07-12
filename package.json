@@ -23,7 +23,7 @@
     "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.1",
     "ip": "^1.1.5",
-    "jest": "^28.1.0",
+    "jest": "^28.1.2",
     "kafkajs": "^2.1.0",
     "lint-staged": "^13.0.3",
     "prettier": "^2.6.2",
