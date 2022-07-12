@@ -224,9 +224,9 @@ sequenceDiagram
     end
     opt Error During Processing?
       alt Retry?
-        cg->>retry:
+        cg->>retry: 
       else Fatal Error or Max Retries Reached?
-        cg->>dead:
+        cg->>dead: 
       end
     end
     cg->>topicA: commit offset
@@ -269,19 +269,19 @@ sequenceDiagram
     participant retry3 as [Kafka]<br>ConsumerGroupX-Retry-3
     participant dead as [Kafka]<br>ConsumerGroupX-DeadLetter
 
-    topicA->>+cg:
+    topicA->>+cg: 
     note over cg: Error processing message<br>(initial attempt)
-    cg-)retry1:
+    cg-)retry1: 
     note over retry1: delay 5 seconds
-    retry1 ->> cg:
+    retry1 ->> cg: 
     note over cg: Error processing message<br>(retry #35;1)
-    cg -) retry2:
+    cg -) retry2: 
     note over retry2: delay 5 seconds
-    retry2 ->> cg:
+    retry2 ->> cg: 
     note over cg: Error processing message<br>(retry #35;2)
-    cg -) retry3:
+    cg -) retry3: 
     note over retry3: delay 60 seconds
-    retry3 ->> cg:
+    retry3 ->> cg: 
     note over cg: Error processing essage<br>(retry #35;3)
     cg -X dead: Send to dead-letter topic
 ```
@@ -314,19 +314,19 @@ sequenceDiagram
     participant retry60s as [Kafka]<br>ConsumerGroupX-Retry-60s
     participant dead as [Kafka]<br>ConsumerGroupX-DeadLetter
 
-    topicA->>+cg:
+    topicA->>+cg: 
     note over cg: Error processing message<br>(initial attempt)
-    cg-)retry5s:
+    cg-)retry5s: 
     note over retry5s: delay 5 seconds
-    retry5s ->> cg:
+    retry5s ->> cg: 
     note over cg: Error processing message<br>(retry #35;1)
-    cg -) retry5s:
+    cg -) retry5s: 
     note over retry5s: delay 5 seconds
-    retry5s ->> cg:
+    retry5s ->> cg: 
     note over cg: Error processing message<br>(retry #35;2)
-    cg -) retry60s:
+    cg -) retry60s: 
     note over retry60s: delay 60 seconds
-    retry60s ->> cg:
+    retry60s ->> cg: 
     note over cg: Error processing essage<br>(retry #35;3)
     cg -X dead: Send to dead-letter topic
 ```
