@@ -301,6 +301,21 @@ describe("eachMessage", () => {
     });
     expect(mockEventHandler).toBeCalledTimes(1);
   });
+  it('allows event listeners to be removed easily', async () => {
+    expect.assertions(3);
+    const mock = jest.fn<AsyncCallback>().mockRejectedValue(new Error("test"));
+    const helper = subject();
+    const mockEventHandler = jest.fn();
+    const remove = helper.on("retry", mockEventHandler);
+    const wrapped = helper.eachMessage(mock);
+    const payload = messagePayload();
+    await wrapped(payload);
+    expect(mock).toBeCalledTimes(1);
+    expect(mockEventHandler).toBeCalledTimes(1);
+    remove();
+    await wrapped(payload);
+    expect(mockEventHandler).toBeCalledTimes(1);
+  });
   it("handles weird error scenarios appropriately", async () => {
     expect.assertions(3);
     const mock = jest
