@@ -301,7 +301,7 @@ describe("eachMessage", () => {
     });
     expect(mockEventHandler).toBeCalledTimes(1);
   });
-  it('allows event listeners to be removed easily', async () => {
+  it("allows event listeners to be removed easily", async () => {
     expect.assertions(3);
     const mock = jest.fn<AsyncCallback>().mockRejectedValue(new Error("test"));
     const helper = subject();

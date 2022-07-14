@@ -61,6 +61,9 @@ Depending on how you want to retry failed messages, you must create topics to st
     For example, if you want to wait 5 seconds for the first two retry attempts and 60 seconds for the third, create topics named `${consumerGroup}-retry-5s` and `${consumerGroup}-retry-60s`.
     You can configure the total number of retry attempts with the `maxRetries` parameter.
 
+Remember, each of the topics used for facilitating retries should also have appropriate retention configurations that don't conflict with your retry times.
+For example, if your retry policy requires messages to be persisted for 24 hours before a retry is attempted, your retention policy should allow plenty of leeway for the retry message to be picked up.
+
 For more information on configuring retries, see [Retry Topic Naming Strategies](#retry-topic-naming-strategies).
 
 ### Example Usage
