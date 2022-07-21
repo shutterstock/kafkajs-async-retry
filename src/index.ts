@@ -274,9 +274,11 @@ export default class AsyncRetryHelper {
   public on(
     event: AsyncRetryEvent | `${AsyncRetryEvent}`,
     listener: (payload: EventPayload) => void
-  ): this {
+  ): () => void {
     this.eventEmitter.on(event, listener);
-    return this;
+    return () => {
+      this.eventEmitter.removeListener(event, listener);
+    };
   }
 
   /**

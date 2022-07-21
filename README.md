@@ -61,6 +61,9 @@ Depending on how you want to retry failed messages, you must create topics to st
     For example, if you want to wait 5 seconds for the first two retry attempts and 60 seconds for the third, create topics named `${consumerGroup}-retry-5s` and `${consumerGroup}-retry-60s`.
     You can configure the total number of retry attempts with the `maxRetries` parameter.
 
+Remember, each of the topics used for facilitating retries should also have appropriate retention configurations that don't conflict with your retry times.
+For example, if your retry policy requires messages to be persisted for 24 hours before a retry is attempted, your retention policy should allow plenty of leeway for the retry message to be picked up.
+
 For more information on configuring retries, see [Retry Topic Naming Strategies](#retry-topic-naming-strategies).
 
 ### Example Usage
@@ -205,36 +208,7 @@ Messages from the "retry" topics are then processed after a configurable delay.
 If a message continues to fail beyond a configurable maximum number of attempts, the message is published to a "dead letter" topic for manual inspection.
 Here's a sequence diagram demonstrating the process:
 
-<!-- prettier-ignore -->
-```mermaid
-sequenceDiagram
-  autonumber
-  participant topicA as [Kafka]<br>Topic A
-  participant cg as ConsumerGroupX
-  participant retry as [Kafka]<br>ConsumerGroupX-Retry-N
-  participant dead as [Kafka]<br>ConsumerGroupX-DeadLetter
-
-  activate cg
-  loop
-    topicA->>cg: fetch batch of messages
-    retry->>cg: fetch batch of messages
-  end
-  loop each message
-    opt From Retry Queue?
-      note over cg: Pause consumption until message<br>is ready to process
-    end
-    opt Error During Processing?
-      alt Retry?
-        cg->>retry: 
-      else Fatal Error or Max Retries Reached?
-        cg->>dead: 
-      end
-    end
-    cg->>topicA: commit offset
-    cg->>retry: commit offset
-  end
-  deactivate cg
-```
+[![](https://mermaid.ink/img/pako:eNqFU9tO3DAQ_ZWRn9kfiNBWiAUeChUFHio1PMzak2A1vmCPESvEvzPOZUtTqZWi-HLOnDknjt-UDoZUozI9F_Kadhb7hK71AFg4-OL2lOoqYmKrbUTPwCFafQaY4edX7H7h4-k-bR_qJpytubqvvPPgc3GUrlIo8ceak4jTYSX3Z8XmrlI239aVhtD8u3AnjGtirinGVJrtCzKJsbocQoh1hDnUZrvVfQMdsX6CPdZ36MBRzthTnpij3f8TyZulAxAKPoOTSIgMlyk4GJPB90KFvkwQgA9iMLxQgtrjFksWv2OuyDZ4KJ7tsOjV0DaLKzQHSQExBS3IpDWbmPpdpBQS7EqyvofbiSbTY1sceLJz3AExIEnHxA0suzSIn0tkHGZJeW7wday1lGWUuGTWKvWwPokszo6TkTQdQyNxnbMs37TLxJ_w2cpf8KwiPX4fsDpR8iM4tEb-8LcKt4qfyFGrxIcy1GEZuFWtfxdqiUbKLozlkFTToYQ8UfUS3B-8Vg2nQgtpviUz6_0D4rQdnw)](https://mermaid.live/edit#pako:eNqFU9tO3DAQ_ZWRn9kfiNBWiAUeChUFHio1PMzak2A1vmCPESvEvzPOZUtTqZWi-HLOnDknjt-UDoZUozI9F_Kadhb7hK71AFg4-OL2lOoqYmKrbUTPwCFafQaY4edX7H7h4-k-bR_qJpytubqvvPPgc3GUrlIo8ceak4jTYSX3Z8XmrlI239aVhtD8u3AnjGtirinGVJrtCzKJsbocQoh1hDnUZrvVfQMdsX6CPdZ36MBRzthTnpij3f8TyZulAxAKPoOTSIgMlyk4GJPB90KFvkwQgA9iMLxQgtrjFksWv2OuyDZ4KJ7tsOjV0DaLKzQHSQExBS3IpDWbmPpdpBQS7EqyvofbiSbTY1sceLJz3AExIEnHxA0suzSIn0tkHGZJeW7wday1lGWUuGTWKvWwPokszo6TkTQdQyNxnbMs37TLxJ_w2cpf8KwiPX4fsDpR8iM4tEb-8LcKt4qfyFGrxIcy1GEZuFWtfxdqiUbKLozlkFTToYQ8UfUS3B-8Vg2nQgtpviUz6_0D4rQdnw)
 
 ### Retry Topic Naming Strategies
 
@@ -260,33 +234,7 @@ To use this retry strategy, use the `RetryTopicNaming.ATTEMPT_BASED` `retryTopic
 Here's a diagram of the message flow using this retry strategy.
 This example uses a maximum of three retries with configured wait times of 5 seconds on the first two retries and a 60-second delay on the final attempt:
 
-<!-- prettier-ignore -->
-```mermaid
-sequenceDiagram
-  autonumber
-    participant topicA as [Kafka]<br>Topic A
-    participant cg as ConsumerGroupX
-    participant retry1 as [Kafka]<br>ConsumerGroupX-Retry-1
-    participant retry2 as [Kafka]<br>ConsumerGroupX-Retry-2
-    participant retry3 as [Kafka]<br>ConsumerGroupX-Retry-3
-    participant dead as [Kafka]<br>ConsumerGroupX-DeadLetter
-
-    topicA->>+cg: 
-    note over cg: Error processing message<br>(initial attempt)
-    cg-)retry1: 
-    note over retry1: delay 5 seconds
-    retry1 ->> cg: 
-    note over cg: Error processing message<br>(retry #35;1)
-    cg -) retry2: 
-    note over retry2: delay 5 seconds
-    retry2 ->> cg: 
-    note over cg: Error processing message<br>(retry #35;2)
-    cg -) retry3: 
-    note over retry3: delay 60 seconds
-    retry3 ->> cg: 
-    note over cg: Error processing essage<br>(retry #35;3)
-    cg -X dead: Send to dead-letter topic
-```
+[![](https://mermaid.ink/img/pako:eNqtk0FLw0AQhf_KsF4sGrAJ9RClUGzxoCfroWA8THencTHZjZuNUEr_u7tJKmqaUsVT2OG9x8fkzYZxLYjFrKS3ihSnqcTUYJ4oAKysVlW-JONfAAUaK7ksUFmwupB8AljC0x2uXvH5emnGj34Ik66ap155o1VZ5WRuja6KRVdlyJr18Efmd1Pw4DXBsMccHmMOe8zRMeaoaxaE4rB16hT3ZK1fZONv1heMx2c8jaGZKW0J9DsZ8LOZMdpAYTSnspQqhdx9MSUffyqVtBIzQJeZF3bQBPA0GDQ77Ebu5oIyXMMISuJaibKRtYt3OPAnnNoPJ9HoaviJAsGg_Sc9MOEhmPA_YMIuTNQDE-1gLi_20ES_o9kLE32BWdSdiWFOSrgq1K8gqwvSNIOdM9eeHKVwl7nxxoTZF8opYY6BCVphldmEJWrrpFUh0NJMSKsNi1eYlXTO_PHO14qz2JqKdqL2ulvV9gPvpFhh)](https://mermaid.live/edit#pako:eNqtk0FLw0AQhf_KsF4sGrAJ9RClUGzxoCfroWA8THencTHZjZuNUEr_u7tJKmqaUsVT2OG9x8fkzYZxLYjFrKS3ihSnqcTUYJ4oAKysVlW-JONfAAUaK7ksUFmwupB8AljC0x2uXvH5emnGj34Ik66ap155o1VZ5WRuja6KRVdlyJr18Efmd1Pw4DXBsMccHmMOe8zRMeaoaxaE4rB16hT3ZK1fZONv1heMx2c8jaGZKW0J9DsZ8LOZMdpAYTSnspQqhdx9MSUffyqVtBIzQJeZF3bQBPA0GDQ77Ebu5oIyXMMISuJaibKRtYt3OPAnnNoPJ9HoaviJAsGg_Sc9MOEhmPA_YMIuTNQDE-1gLi_20ES_o9kLE32BWdSdiWFOSrgq1K8gqwvSNIOdM9eeHKVwl7nxxoTZF8opYY6BCVphldmEJWrrpFUh0NJMSKsNi1eYlXTO_PHO14qz2JqKdqL2ulvV9gPvpFhh)
 
 #### Topics based on the configured delay
 
@@ -307,32 +255,7 @@ To use this retry strategy, use the `RetryTopicNaming.DELAY_BASED` `retryTopicNa
 
 Here's a sequence diagram of the various topics needing when using a `DELAY_BASED` naming strategy with the `retryDelays` parameter set to `[5, 5, 60]`:
 
-<!-- prettier-ignore -->
-```mermaid
-sequenceDiagram
-  autonumber
-    participant topicA as [Kafka]<br>Topic A
-    participant cg as ConsumerGroupX
-    participant retry5s as [Kafka]<br>ConsumerGroupX-Retry-5s
-    participant retry60s as [Kafka]<br>ConsumerGroupX-Retry-60s
-    participant dead as [Kafka]<br>ConsumerGroupX-DeadLetter
-
-    topicA->>+cg: 
-    note over cg: Error processing message<br>(initial attempt)
-    cg-)retry5s: 
-    note over retry5s: delay 5 seconds
-    retry5s ->> cg: 
-    note over cg: Error processing message<br>(retry #35;1)
-    cg -) retry5s: 
-    note over retry5s: delay 5 seconds
-    retry5s ->> cg: 
-    note over cg: Error processing message<br>(retry #35;2)
-    cg -) retry60s: 
-    note over retry60s: delay 60 seconds
-    retry60s ->> cg: 
-    note over cg: Error processing essage<br>(retry #35;3)
-    cg -X dead: Send to dead-letter topic
-```
+[![](https://mermaid.ink/img/pako:eNrFkzFPwzAQhf_KySxUNFKhSoeAKlW0YoCJMlQiDFf7GiwSO9gOUlX1v2MnaQWkRcDCFPn87unz5d2GcS2IJczSa0WK01RiZrBIFQBWTquqWJIJJ4ASjZNclqgcOF1KPgG08HiLqxd8ulqa8UMowqSr5llQXmtlq4LMjdFVueiqDDmzju0X089d0X0QRbE90j4a_Kjfy7oGglB83zz1ijtyLkyk6W_mEI3HZzxLoKkp7Qj0GxkItZkx2kBpNCdrpcqg8F_MKNifSiWdxBzQexal6zUGPIt67TC6nvsLQTmuIQZLXCvRvmc3Q08EfyKqDeBkGF-e72kg6sH_81x0efxvPAJU3zREo8EBpJCTXzEdRBp-QFrU-UlgTkr4WNSnKK_D0qSE9ZlPUoFS-HXbhMaUuWcqKGWegQlaYZW7lKVq66VVKdDRTEinDUtWmFvqs7CR87XiLHGmop2oXdlWtX0H7LVJmA)](https://mermaid.live/edit#pako:eNrFkzFPwzAQhf_KySxUNFKhSoeAKlW0YoCJMlQiDFf7GiwSO9gOUlX1v2MnaQWkRcDCFPn87unz5d2GcS2IJczSa0WK01RiZrBIFQBWTquqWJIJJ4ASjZNclqgcOF1KPgG08HiLqxd8ulqa8UMowqSr5llQXmtlq4LMjdFVueiqDDmzju0X089d0X0QRbE90j4a_Kjfy7oGglB83zz1ijtyLkyk6W_mEI3HZzxLoKkp7Qj0GxkItZkx2kBpNCdrpcqg8F_MKNifSiWdxBzQexal6zUGPIt67TC6nvsLQTmuIQZLXCvRvmc3Q08EfyKqDeBkGF-e72kg6sH_81x0efxvPAJU3zREo8EBpJCTXzEdRBp-QFrU-UlgTkr4WNSnKK_D0qSE9ZlPUoFS-HXbhMaUuWcqKGWegQlaYZW7lKVq66VVKdDRTEinDUtWmFvqs7CR87XiLHGmop2oXdlWtX0H7LVJmA)
 
 ## API
 

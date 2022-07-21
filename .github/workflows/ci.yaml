@@ -2,10 +2,15 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
+      - alpha
+      - beta
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
+      - alpha
+      - beta
 
 jobs:
   build:
@@ -26,6 +31,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm install -g npm
       - run: npm ci
       - run: npm run build
       - run: npm run lint
@@ -36,3 +43,17 @@ jobs:
       - name: Stop containers
         if: always()
         run: docker-compose -f "docker-compose.yml" down
+  publish:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm run build
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
