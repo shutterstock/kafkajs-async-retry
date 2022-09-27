@@ -1,8 +1,9 @@
+---
 name: Node.js CI
 
-on:
+"on":
   push:
-    branches: 
+    branches:
       - main
       - alpha
       - beta
@@ -14,7 +15,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:

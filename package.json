@@ -43,7 +43,7 @@
     "test": "jest",
     "test:integration": "INTEGRATION_KAFKA_BROKER=localhost:9092 jest --coverage=false src/integration.test.ts",
     "lint": "eslint --ext .mjs,.cjs,.js,.ts .",
-    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json|md)\"",
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json|md|yaml|yml)\"",
     "prepare": "husky install",
     "semantic-release": "semantic-release"
   },

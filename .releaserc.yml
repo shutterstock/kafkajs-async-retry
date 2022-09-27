@@ -1,4 +1,4 @@
-branches: 
+branches:
   - main
   - name: beta
     prerelease: true

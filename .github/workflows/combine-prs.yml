@@ -1,26 +1,26 @@
-name: 'Combine PRs'
+name: "Combine PRs"
 
 # Controls when the action will run - in this case triggered manually
 on:
   workflow_dispatch:
     inputs:
       branchPrefix:
-        description: 'Branch prefix to find combinable PRs based on'
+        description: "Branch prefix to find combinable PRs based on"
         required: true
         type: string
         default: dependabot
       mustBeGreen:
-        description: 'Only combine PRs that are green (status is success)'
+        description: "Only combine PRs that are green (status is success)"
         type: boolean
         required: true
         default: true
       combineBranchName:
-        description: 'Name of the branch to combine PRs into'
+        description: "Name of the branch to combine PRs into"
         type: string
         required: true
-        default: 'combine-prs-branch'
+        default: "combine-prs-branch"
       ignoreLabel:
-        description: 'Exclude PRs with this label'
+        description: "Exclude PRs with this label"
         type: string
         required: true
         default: nocombine
@@ -93,7 +93,7 @@ jobs:
 
             core.setOutput('base-branch', base_branch);
             core.setOutput('prs-string', prs.join('\n'));
-            
+
             combined = branches.join(' ')
             console.log('Combined: ' + combined);
             return combined
@@ -111,14 +111,14 @@ jobs:
           echo "$BRANCHES_TO_COMBINE"
           sourcebranches="${BRANCHES_TO_COMBINE%\"}"
           sourcebranches="${sourcebranches#\"}"
-          
+
           basebranch="${BASE_BRANCH%\"}"
           basebranch="${basebranch#\"}"
-          
+
           git config pull.rebase false
           git config user.name github-actions
           git config user.email github-actions@github.com
-          
+
           git branch $COMBINE_BRANCH_NAME $basebranch
           git checkout $COMBINE_BRANCH_NAME
           git pull origin $sourcebranches --no-edit
