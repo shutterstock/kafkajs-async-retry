@@ -83,7 +83,7 @@ export type AsyncRetryAwareEachBatchPayload = EachBatchPayload & {
 };
 
 export type AsyncRetryAwareBatchHandler = (
-  payload: AsyncRetryAwareEachBatchPayload
+  payload: AsyncRetryAwareEachBatchPayload,
 ) => Promise<void>;
 
 interface ARHeaders {
@@ -118,13 +118,13 @@ export type AsyncRetryAwareEachMessagePayload = EachMessagePayload & {
 };
 
 export type AsyncRetryAwareMessageHandler = (
-  payload: AsyncRetryAwareEachMessagePayload
+  payload: AsyncRetryAwareEachMessagePayload,
 ) => Promise<void>;
 
 function hasOwnProperty<X extends object, Y extends PropertyKey>(
   obj: X,
   prop: Y,
-  type: string
+  type: string,
 ): obj is X & Record<Y, unknown> {
   return (
     Object.prototype.hasOwnProperty.call(obj, prop) &&
@@ -144,7 +144,7 @@ function isValidARHeaders(value: unknown): value is ARHeaders {
 }
 
 function extractAsyncRetryHeaders(
-  headers: KafkaMessage["headers"]
+  headers: KafkaMessage["headers"],
 ): ARHeaders | undefined {
   if (!headers || !("asyncRetry" in headers) || !headers["asyncRetry"]) return;
 
@@ -162,10 +162,10 @@ class WaitBeforeProcessing extends KafkaJSNonRetriableError {
   constructor(
     public readonly waitMs: number,
     public readonly topic: string,
-    public readonly partition: number
+    public readonly partition: number,
   ) {
     super(
-      `Waiting ${waitMs}ms before resuming processing messages from ${topic}/${partition}`
+      `Waiting ${waitMs}ms before resuming processing messages from ${topic}/${partition}`,
     );
     Object.setPrototypeOf(this, WaitBeforeProcessing.prototype);
   }
@@ -238,7 +238,7 @@ export default class AsyncRetryHelper {
     }
     if (retryDelays.length > maxRetries) {
       throw new Error(
-        `retryDelays (${retryDelays}) doesn't need to be longer than maxRetries (${maxRetries})`
+        `retryDelays (${retryDelays}) doesn't need to be longer than maxRetries (${maxRetries})`,
       );
     }
 
@@ -273,7 +273,7 @@ export default class AsyncRetryHelper {
    */
   public on(
     event: AsyncRetryEvent | `${AsyncRetryEvent}`,
-    listener: (payload: EventPayload) => void
+    listener: (payload: EventPayload) => void,
   ): () => void {
     this.eventEmitter.on(event, listener);
     return () => {
@@ -287,19 +287,19 @@ export default class AsyncRetryHelper {
    * @returns {EachMessageHandler} - a standard message handler that can be passed to a KafkaJS consumer instance
    */
   public eachMessage(
-    handler: AsyncRetryAwareMessageHandler
+    handler: AsyncRetryAwareMessageHandler,
   ): EachMessageHandler {
     return async (payload) => {
       const { isReady, ...details } = this.asyncRetryMessageDetails(
         payload.message.headers || {},
-        payload.topic
+        payload.topic,
       );
       if (!isReady) {
         await this.pauseUntilMessageIsReady(
           payload.topic,
           payload.partition,
           details.processTime,
-          payload.pause
+          payload.pause,
         );
       }
       try {
@@ -330,7 +330,7 @@ export default class AsyncRetryHelper {
           message,
           details: this.asyncRetryMessageDetails(
             message.headers || {},
-            payload.batch.topic
+            payload.batch.topic,
           ),
         });
 
@@ -342,18 +342,18 @@ export default class AsyncRetryHelper {
         while (allMessages.length > 0) {
           const readyMessages = this.extractReadyMessages(
             payload.batch.topic,
-            allMessages
+            allMessages,
           );
           if (!readyMessages) {
             const details = this.asyncRetryMessageDetails(
               allMessages[0].headers,
-              payload.batch.topic
+              payload.batch.topic,
             );
             await this.pauseUntilMessageIsReady(
               payload.batch.topic,
               payload.batch.partition,
               details.processTime,
-              payload.pause
+              payload.pause,
             );
             continue;
           }
@@ -378,15 +378,15 @@ export default class AsyncRetryHelper {
 
   private extractReadyMessages(
     topic: string,
-    messages: KafkaMessage[]
+    messages: KafkaMessage[],
   ): NonEmptyArray<KafkaMessage> | undefined {
     // we want to grab a contiguous series of "ready" messages and leave the rest as-is
     const firstNotReady = messages.findIndex(
-      (m) => !this.asyncRetryMessageDetails(m.headers, topic).isReady
+      (m) => !this.asyncRetryMessageDetails(m.headers, topic).isReady,
     );
     const readyMessages = messages.splice(
       0,
-      firstNotReady === -1 ? messages.length : firstNotReady
+      firstNotReady === -1 ? messages.length : firstNotReady,
     );
     return readyMessages.length > 0
       ? (readyMessages as NonEmptyArray<KafkaMessage>)
@@ -397,7 +397,7 @@ export default class AsyncRetryHelper {
     topic: string,
     partition: number,
     processTime: Date,
-    pause: () => () => void
+    pause: () => () => void,
   ): Promise<void> {
     const waitTime = processTime.getTime() - Date.now();
     if (waitTime < this.maxWaitTime) {
@@ -422,7 +422,7 @@ export default class AsyncRetryHelper {
 
   private asyncRetryMessageDetails(
     headers: KafkaMessage["headers"],
-    topic: string
+    topic: string,
   ): AsyncRetryMessageDetails {
     const arHeaders = extractAsyncRetryHeaders(headers);
     if (arHeaders) {
@@ -447,7 +447,7 @@ export default class AsyncRetryHelper {
     details: Pick<
       AsyncRetryMessageDetails,
       "previousAttempts" | "originalTopic"
-    >
+    >,
   ): IHeaders {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const ttl = Date.now() + this.retryDelays[details.previousAttempts]! * 1000;
@@ -492,7 +492,7 @@ export default class AsyncRetryHelper {
 
     this.eventEmitter.emit(
       shouldDeadLetter ? AsyncRetryEvent.DEAD_LETTER : AsyncRetryEvent.RETRY,
-      { message, details, error, topic: nextTopic }
+      { message, details, error, topic: nextTopic },
     );
   }
 }

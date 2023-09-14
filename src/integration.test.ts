@@ -117,7 +117,7 @@ maybe("Integration", () => {
         maxWaitTimeInMs: 100,
       });
       await Promise.all(
-        [consumer, producer, testConsumer].map((c) => c.connect())
+        [consumer, producer, testConsumer].map((c) => c.connect()),
       );
 
       await consumer.subscribe({
@@ -134,7 +134,7 @@ maybe("Integration", () => {
           partitionsConsumedConcurrently: 100,
           eachMessage: subject.eachMessage(async (payload) => {
             const data: TestMessage = JSON.parse(
-              String(payload.message.value || "{}")
+              String(payload.message.value || "{}"),
             );
             if (data.instantDeadLetter) {
               throw new DeadLetter("Instant dead letter");
@@ -153,7 +153,7 @@ maybe("Integration", () => {
 
     afterAll(async () => {
       await Promise.all(
-        [admin, consumer, producer, testConsumer].map((c) => c.disconnect())
+        [admin, consumer, producer, testConsumer].map((c) => c.disconnect()),
       );
     });
 
