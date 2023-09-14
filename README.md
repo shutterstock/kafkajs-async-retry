@@ -104,7 +104,7 @@ await consumer.run({
       // do something with the message (exceptions will be caught and the
       // message will be sent to the appropriate retry or dead-letter topic)
       processMessage(message);
-    }
+    },
   ),
 });
 ```
@@ -162,7 +162,7 @@ await consumer.run({
       // do something with the message (exceptions will be caught and the
       // message will be sent to the appropriate retry or dead-letter topic)
       processMessage(message);
-    }
+    },
   ),
 });
 
@@ -174,7 +174,7 @@ await consumer.run({
       payload.batch.messages.forEach((message) => {
         if (asyncRetryMessageDetails.previousAttempts > 0) {
           console.log(
-            `Retrying message from topic ${asyncRetryMessageDetails.originalTopic}`
+            `Retrying message from topic ${asyncRetryMessageDetails.originalTopic}`,
           );
         }
         try {
@@ -183,7 +183,7 @@ await consumer.run({
           messageFailureHandler(err, message);
         }
       });
-    }
+    },
   ),
 });
 

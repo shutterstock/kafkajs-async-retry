@@ -32,7 +32,7 @@ describe("constructor", () => {
   it("throws if maxRetries is invalid", () => {
     expect.assertions(1);
     expect(
-      () => new AsyncRetryHelper({ ...validConfig, maxRetries: -1 })
+      () => new AsyncRetryHelper({ ...validConfig, maxRetries: -1 }),
     ).toThrow();
   });
   it("throws if retryDelays exceeds maxRetries", () => {
@@ -43,7 +43,7 @@ describe("constructor", () => {
           ...validConfig,
           retryDelays: [1, 2],
           maxRetries: 1,
-        })
+        }),
     ).toThrow();
   });
   it("accepts fewer retry delays than max retries", () => {
@@ -93,7 +93,7 @@ describe("constructor", () => {
       maxRetries: 3,
     });
     expect(subject.retryTopicPattern.toString()).toEqual(
-      "/^test-group-retry-\\d+s?$/"
+      "/^test-group-retry-\\d+s?$/",
     );
   });
 });
@@ -116,7 +116,7 @@ describe("eachMessage", () => {
   const messagePayload = (
     headers: KafkaMessage["headers"] = undefined,
     topic = TOPIC,
-    partition = 0
+    partition = 0,
   ): EachMessagePayload => ({
     heartbeat,
     topic,
@@ -153,7 +153,7 @@ describe("eachMessage", () => {
     const wrapped = subject().eachMessage(mock);
     const payload = messagePayload(
       arHeaders({ ttl: Date.now() - 1, att: 1 }),
-      RETRY_TOPIC_30
+      RETRY_TOPIC_30,
     );
     await wrapped(payload);
     expect(mock).toBeCalledTimes(1);
@@ -215,7 +215,7 @@ describe("eachMessage", () => {
     const wrapped = subject().eachMessage(mock);
     const payload = messagePayload(
       arHeaders({ att: 1, ttl: Date.now() + 500 }),
-      RETRY_TOPIC_30
+      RETRY_TOPIC_30,
     );
     const result = wrapped(payload);
     expect(setTimeout).toHaveBeenCalledTimes(1);
@@ -233,35 +233,35 @@ describe("eachMessage", () => {
     // first message (pauses)
     await expect(
       async () =>
-        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30))
+        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30)),
     ).rejects.toThrow();
     expect(pause).toBeCalledTimes(1);
 
     // second message (should not pause again since its the same topic/partition)
     await expect(
       async () =>
-        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30))
+        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30)),
     ).rejects.toThrow();
     expect(pause).toBeCalledTimes(1);
 
     // third message (should pause again since its for a different partition (but same topic))
     await expect(
       async () =>
-        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30, 1))
+        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30, 1)),
     ).rejects.toThrow();
     expect(pause).toBeCalledTimes(2);
 
     // fourth message (should pause again since its for a different partition AND topic)
     await expect(
       async () =>
-        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_60, 1))
+        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_60, 1)),
     ).rejects.toThrow();
     expect(pause).toBeCalledTimes(3);
 
     // fifth message (back to the first topic/partition, no pause/resume needed)
     await expect(
       async () =>
-        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30))
+        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30)),
     ).rejects.toThrow();
     expect(pause).toBeCalledTimes(3);
 
@@ -271,7 +271,7 @@ describe("eachMessage", () => {
     // sixth message (topic has been resumed, should pause again)
     await expect(
       async () =>
-        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30))
+        await wrapped(messagePayload(arHeaders({ att: 1 }), RETRY_TOPIC_30)),
     ).rejects.toThrow();
     expect(pause).toBeCalledTimes(4);
   });
@@ -348,7 +348,7 @@ describe("eachMessage", () => {
     const wrapped = helper.eachMessage(mock);
     const payload = messagePayload(
       arHeaders({ ttl: Date.now() - 1, att: 5 }),
-      RETRY_TOPIC_30
+      RETRY_TOPIC_30,
     );
     await wrapped(payload);
     expect(mock).toBeCalledTimes(1);
@@ -372,7 +372,7 @@ describe("eachMessage", () => {
 describe("eachBatch", () => {
   let i = 1;
   const makeMessage = (
-    headers: KafkaMessage["headers"] = undefined
+    headers: KafkaMessage["headers"] = undefined,
   ): KafkaMessage => ({
     ...(headers ? { headers } : { size: 0 }),
     key: Buffer.from(String(i++)),
@@ -409,10 +409,10 @@ describe("eachBatch", () => {
       messages: [
         ...[...Array(readyMessages).keys()].map(() => makeMessage()),
         ...[...Array(notReadyMessages).keys()].map(() =>
-          makeMessage(arHeaders({ ttl: Date.now() + notReadyDelay, att: 1 }))
+          makeMessage(arHeaders({ ttl: Date.now() + notReadyDelay, att: 1 })),
         ),
         ...[...Array(afterReadyMessages).keys()].map(() =>
-          makeMessage(arHeaders({ ttl: Date.now() - 1, att: 1 }))
+          makeMessage(arHeaders({ ttl: Date.now() - 1, att: 1 })),
         ),
       ],
     },
@@ -429,7 +429,7 @@ describe("eachBatch", () => {
         ...payload,
         asyncRetryMessageDetails: expect.any(Function),
         messageFailureHandler: expect.any(Function),
-      })
+      }),
     );
   });
   it("passes all ready messages when retrying", async () => {
@@ -444,7 +444,7 @@ describe("eachBatch", () => {
         batch: expect.objectContaining({
           messages: payload.batch.messages,
         }),
-      })
+      }),
     );
   });
 
@@ -477,7 +477,7 @@ describe("eachBatch", () => {
     expect(setTimeout).toHaveBeenCalledTimes(1);
     expect(setTimeout).toHaveBeenLastCalledWith(
       expect.any(Function),
-      notReadyDelay
+      notReadyDelay,
     );
     jest.runAllTimers();
     await result;
@@ -507,7 +507,7 @@ describe("eachBatch", () => {
       .mockImplementation(async (payload) => {
         await payload.messageFailureHandler(
           new Error("test-error"),
-          payload.batch.messages[0]!
+          payload.batch.messages[0]!,
         );
         return;
       });
@@ -535,7 +535,7 @@ describe("eachBatch", () => {
       .fn<AsyncRetryAwareBatchHandler>()
       .mockImplementation(async (payload) => {
         const details = payload.asyncRetryMessageDetails(
-          payload.batch.messages[0]!
+          payload.batch.messages[0]!,
         );
         expect(details).toEqual({
           isReady: true,
@@ -557,7 +557,7 @@ describe("eachBatch", () => {
       .mockImplementation(async (payload) => {
         await payload.messageFailureHandler(
           new DeadLetter("test-error"),
-          payload.batch.messages[0]!
+          payload.batch.messages[0]!,
         );
         return;
       });
