@@ -34,7 +34,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/github-script@v3
+      - uses: actions/github-script@v6
         id: fetch-branch-names
         name: Fetch branch names
         with:
