@@ -56,7 +56,7 @@ jobs:
                 statusOK = true;
                 if(${{ github.event.inputs.mustBeGreen }}) {
                   console.log('Checking green status: ' + branch);
-                  const prDetails = await github.pulls.get({
+                  const prDetails = await github.rest.pulls.get({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     pull_number: pr,
@@ -124,7 +124,7 @@ jobs:
           git pull origin $sourcebranches --no-edit
           git push origin $COMBINE_BRANCH_NAME
       # Creates a PR with the new combined branch
-      - uses: actions/github-script@v3
+      - uses: actions/github-script@v6
         name: Create Combined Pull Request
         env:
           PRS_STRING: ${{ steps.fetch-branch-names.outputs.prs-string }}
@@ -133,7 +133,7 @@ jobs:
           script: |
             const prString = process.env.PRS_STRING;
             const body = 'This PR was created by the Combine PRs action by combining the following PRs:\n' + prString;
-            await github.pulls.create({
+            await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: 'Combined PR',
