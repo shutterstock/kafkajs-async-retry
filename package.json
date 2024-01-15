@@ -20,7 +20,7 @@
     "@types/node": "^20.6.0",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
-    "@vidavidorra/commitlint-config": "^5.0.2",
+    "@vidavidorra/commitlint-config": "^6.0.2",
     "eslint": "^8.49.0",
     "eslint-config-prettier": "^9.0.0",
     "husky": "^8.0.3",
@@ -29,7 +29,7 @@
     "kafkajs": "^2.2.4",
     "lint-staged": "^15.0.1",
     "prettier": "^3.0.3",
-    "semantic-release": "^22.0.0",
+    "semantic-release": "^23.0.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
