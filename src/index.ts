@@ -1,14 +1,20 @@
-import EventEmitter from "events";
-import {
+import { EventEmitter } from "events";
+import type {
   EachBatchHandler,
   EachBatchPayload,
   EachMessageHandler,
   EachMessagePayload,
   IHeaders,
   KafkaMessage,
+  KafkaJSNonRetriableError as NonRetriableError,
   Producer,
-  KafkaJSNonRetriableError,
 } from "kafkajs";
+
+// this nonsense is necessary because of the esm/cjs interop issues -- patches welcome! :)
+import * as kafkaJs from "kafkajs";
+const { KafkaJSNonRetriableError } = (
+  "default" in kafkaJs ? kafkaJs.default : kafkaJs
+) as { KafkaJSNonRetriableError: typeof NonRetriableError };
 
 /**
  * Different strategies for naming retry topics
@@ -496,3 +502,5 @@ export default class AsyncRetryHelper {
     );
   }
 }
+
+export { AsyncRetryHelper };
