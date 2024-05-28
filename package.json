@@ -17,6 +17,7 @@
     "dist/esm/index.js",
     "dist/esm/package.json",
     "dist/cjs/index.js",
+    "dist/cjs/package.json",
     "dist/types/index.d.ts",
     "README.md"
   ],
