@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: "18"
       - run: npm install
-      - uses: wagoid/commitlint-github-action@v5
+      - uses: wagoid/commitlint-github-action@v6
         with:
           configFile: .commitlintrc.yml
         env:
