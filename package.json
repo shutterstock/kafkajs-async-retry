@@ -2,11 +2,23 @@
   "name": "kafkajs-async-retry",
   "version": "0.0.0-development",
   "description": "A helper intended for use with KafkaJS that assists with retrying failed messages an an async manner",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/esm/index.js"
+    }
+  },
   "files": [
-    "dist/index.js",
-    "dist/index.d.ts",
+    "dist/esm/index.js",
+    "dist/esm/package.json",
+    "dist/cjs/index.js",
+    "dist/cjs/package.json",
+    "dist/types/index.d.ts",
     "README.md"
   ],
   "author": {
@@ -20,7 +32,7 @@
     "@types/node": "^20.11.20",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
-    "@vidavidorra/commitlint-config": "^6.0.5",
+    "@vidavidorra/commitlint-config": "^7.0.6",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.0.11",
@@ -36,8 +48,8 @@
     "kafkajs": "^2.1.0"
   },
   "scripts": {
-    "build": "tsc --project ./tsconfig-dist.json",
-    "clean": "tsc --build ./tsconfig-dist.json --clean && rm -rf dist coverage *.tsbuildinfo",
+    "build": "tsc -b ./tsconfig-dist-esm.json ./tsconfig-dist-cjs.json ./tsconfig-dist-types.json && echo '{\"type\":\"module\"}' > dist/esm/package.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "clean": "tsc --build ./tsconfig-dist-esm.json ./tsconfig-dist-cjs.json ./tsconfig-dist-types.json --clean && rm -rf dist coverage *.tsbuildinfo",
     "test": "jest",
     "test:integration": "INTEGRATION_KAFKA_BROKER=localhost:9092 jest --coverage=false src/integration.test.ts",
     "lint": "eslint --ext .mjs,.cjs,.js,.ts .",

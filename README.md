@@ -71,7 +71,7 @@ For more information on configuring retries, see [Retry Topic Naming Strategies]
 To use this module, create an `AsyncRetryHelper` object with the parameters that specify the retry delay, retry strategy, and number of retries, as in this example:
 
 ```typescript
-import AsyncRetryHelper, { RetryTopicNaming } from "kafkajs-async-retry";
+import { AsyncRetryHelper, RetryTopicNaming } from "kafkajs-async-retry";
 
 const asyncRetryHelper = new AsyncRetryHelper({
   producer,
@@ -113,8 +113,7 @@ Here's a complete example:
 
 ```typescript
 const { Kafka } = require("kafkajs");
-const AsyncRetryHelper,
-  { RetryTopicNaming } = require("kafkajs-async-retry");
+const { AsyncRetryHelper, RetryTopicNaming } = require("kafkajs-async-retry");
 
 const kafka = new Kafka({
   clientId: "my-app",
@@ -261,7 +260,7 @@ Here's a sequence diagram of the various topics needing when using a `DELAY_BASE
 
 ### `AsyncRetryHelper` (constructor)
 
-This is the default export and is the primary entry point for all functionality provided by this module.
+This is the default export (but also exported as a named export) and is the primary entry point for all functionality provided by this module.
 It accepts a single argument, an object with the following properties:
 
 | Property           | Type                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
