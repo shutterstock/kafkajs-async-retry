@@ -71,6 +71,7 @@ For more information on configuring retries, see [Retry Topic Naming Strategies]
 To use this module, create an `AsyncRetryHelper` object with the parameters that specify the retry delay, retry strategy, and number of retries, as in this example:
 
 ```typescript
+//Note: The producer should already be connected to the Kafka cluster
 import AsyncRetryHelper, { RetryTopicNaming } from "kafkajs-async-retry";
 
 const asyncRetryHelper = new AsyncRetryHelper({
@@ -122,6 +123,8 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
+await producer.connect();
+
 const consumer = kafka.consumer({ groupId: "test-group" });
 
 const asyncRetryHelper = new AsyncRetryHelper({
