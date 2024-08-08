@@ -152,7 +152,7 @@ function extractAsyncRetryHeaders(
     const arHeaders = JSON.parse(String(headers["asyncRetry"])) as unknown;
     if (!isValidARHeaders(arHeaders)) return;
     return arHeaders as ARHeaders;
-  } catch (err: unknown) {
+  } catch {
     return; // ignore malformed headers
   }
 }
@@ -449,7 +449,6 @@ export default class AsyncRetryHelper {
       "previousAttempts" | "originalTopic"
     >,
   ): IHeaders {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const ttl = Date.now() + this.retryDelays[details.previousAttempts]! * 1000;
     const headers: ARHeaders = {
       ttl,
@@ -472,7 +471,6 @@ export default class AsyncRetryHelper {
     if (shouldDeadLetter) {
       nextTopic = this.deadLetterTopic;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       nextTopic = this._retryTopics[details.previousAttempts]!;
       headers = this.prepareAsyncRetryHeaders(details);
     }
