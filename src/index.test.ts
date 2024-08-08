@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, expect, it, jest } from "@jest/globals";
 import type {
   EachBatchPayload,

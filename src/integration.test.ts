@@ -34,7 +34,6 @@ maybe("Integration", () => {
   beforeAll(() => {
     kafka = new Kafka({
       logLevel: logLevel.WARN,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       brokers: process.env["INTEGRATION_KAFKA_BROKER"]!.split(","),
     });
   });
