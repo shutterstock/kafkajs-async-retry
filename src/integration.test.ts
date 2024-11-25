@@ -96,7 +96,7 @@ maybe("Integration", () => {
         groupId: TEST_GROUP,
         producer,
         retryDelays: [1, 2, 3, 5],
-        maxWaitTime: Infinity,
+        maxWaitTime: 3000, // Infinity,
         maxRetries: 4,
       });
 
